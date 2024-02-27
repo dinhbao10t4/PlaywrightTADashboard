@@ -1,0 +1,5 @@
+{
+    "login_error_message": "Username or password is invalid",
+    "delete_page_confirm_message": "Are you sure you want to remove this page?",
+    "delete_page_warning_essage": "Cannot delete page '%s' since it has child page(s)."
+}
