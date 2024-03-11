@@ -3,7 +3,7 @@
         "username": "invalid_user",
         "password": "invalid_pass"
     },
-    "john_user": {
+    "johnUser": {
         "username": "john",
         "password": ""
     }

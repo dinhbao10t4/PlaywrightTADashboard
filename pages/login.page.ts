@@ -28,6 +28,8 @@ export class LoginPage extends BasePage {
     }
 
     async verifyTheErrorMessageIsDisplayed() {
-        this.page.on('dialog', dialog => expect.soft(dialog.message).toBe(messages.login_error_message));
+        this.page.once('dialog', dialog => {
+            expect.soft(dialog.message().trim()).toBe(messages.loginErrorMessage);
+        });
     }
 }

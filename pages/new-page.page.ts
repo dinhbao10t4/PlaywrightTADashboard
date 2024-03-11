@@ -1,6 +1,7 @@
 import { Page, Locator } from "@playwright/test";
 import { BasePage } from "./base.page";
 import {Utils} from "../utils/utils";
+import { MainPage } from "../model/main-page";
 
 export class NewPage extends BasePage {
     readonly newPageNameTextbox: Locator;
@@ -20,18 +21,18 @@ export class NewPage extends BasePage {
         this.okButton = this.page.locator("#OK");
     }
 
-    async createNewPage(newpageName: string, parentPage?: string, numberOfColumn?: string, displayAfter?: string, isPublic?: boolean) {
-        await this.newPageNameTextbox.fill(newpageName);
-        if (!Utils.isEmpty(parentPage) && parentPage != undefined) {
-            await this.parentPageSelection.selectOption(parentPage);
+    async createNewPage(mainPage: MainPage, newpageName?: string, parentPage?: string, numberOfColumn?: string, displayAfter?: string, isPublic?: boolean) {
+        await this.newPageNameTextbox.fill(mainPage.getName());
+        if (!Utils.isEmpty(mainPage.getParentPage()) && mainPage.getParentPage() != undefined) {
+            await this.parentPageSelection.selectOption(mainPage.getParentPage());
         }
-        if (!Utils.isEmpty(numberOfColumn) && numberOfColumn != undefined) {
-            await this.numberOfColumnSelection.selectOption(numberOfColumn);
+        if (!Utils.isEmpty(mainPage.getNumberOfColumn()) && mainPage.getNumberOfColumn() != undefined) {
+            await this.numberOfColumnSelection.selectOption(mainPage.getNumberOfColumn());
         }
-        if (!Utils.isEmpty(displayAfter) && displayAfter != undefined) {
-            await this.displayAfterSelection.selectOption(displayAfter);
+        if (!Utils.isEmpty(mainPage.getDisplayAfter()) && mainPage.getDisplayAfter() != undefined) {
+            await this.displayAfterSelection.selectOption(mainPage.getDisplayAfter());
         }
-        if (isPublic != null && isPublic != undefined) {
+        if (mainPage.isPublic() != null && mainPage.isPublic() != undefined) {
             await this.publicCheckbox.check();
         }
         await this.okButton.click();

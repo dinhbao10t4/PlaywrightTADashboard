@@ -1,7 +1,8 @@
-import {test, expect} from "../fixtures/page.objects"
+import {test} from "../fixtures/page.objects"
 import configuration from "../config/configuration.json"
 import { Utils } from "../utils/utils"
 import { GlobalSetting } from "../enum/global-settings"
+import { MainPage } from "../model/main-page";
 
 test.describe("Delete Page Tests", () => {
     test.beforeEach(async ({ loginPage }) => {
@@ -10,28 +11,27 @@ test.describe("Delete Page Tests", () => {
     });
     
     test("Verify that user can remove any main parent page except Overview page successfully and the order of pages stays persistent as long as there is not children page under it", async ({loginPage, dashboardPage, newPage}) => {
-        const parentPageName = Utils.generateRandomString();
-        const childPageName = Utils.generateRandomString();
+        let parentPage = new MainPage(Utils.generateRandomString());
+        let childPage = new MainPage(Utils.generateRandomString(), parentPage.getName());
 
         await dashboardPage.goToGlobalSettingsFeature(GlobalSetting.ADD_PAGE);
-        await newPage.createNewPage(parentPageName);
+        await newPage.createNewPage(parentPage);
         await dashboardPage.goToGlobalSettingsFeature(GlobalSetting.ADD_PAGE);
-        await newPage.createNewPage(childPageName, parentPageName);
+        await newPage.createNewPage(childPage);
 
         // delete the parent page which has child page
-        await dashboardPage.goToMainPage(parentPageName);
-        await dashboardPage.clickGlobalSettingsButton();
-        await dashboardPage.verifyTheMessageWhenDeletingPageThatHasChildPage(parentPageName);
-        await dashboardPage.clickDeleteCurrentPageButton();
+        await dashboardPage.goToMainPage(parentPage.getName());
+        await dashboardPage.verifyTheMessageWhenDeletingPageThatHasChildPage(parentPage.getName());
+        await dashboardPage.deleteCurrentPage();
 
         // delete the child page
-        await dashboardPage.goToChildPage(childPageName, parentPageName);
+        await dashboardPage.goToChildPage(childPage.getName(), childPage.getParentPage());
         await dashboardPage.deleteCurrentPage();
-        await dashboardPage.isChildPageDeleted(childPageName, parentPageName);
+        await dashboardPage.verifyChildPageDelete(childPage.getName(), childPage.getParentPage());
 
         // delete the main page
-        await dashboardPage.goToMainPage(parentPageName);
+        await dashboardPage.goToMainPage(parentPage.getName());
         await dashboardPage.deleteCurrentPage();
-        await dashboardPage.isMainPageDeleted(parentPageName);
+        await dashboardPage.verifyMainPageDelete(parentPage.getName());
     });
 });

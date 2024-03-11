@@ -17,24 +17,24 @@ export class DashboardPage extends BasePage {
         this.deleteCurrentPageButton = this.page.locator("//a[contains(text(), 'Delete')]");
     }
 
-    async isDisplayed() {
+    async verifyDashBoardDisplays() {
         await expect(this.page).toHaveTitle(/Execution Dashboard/);
     }
 
-    async clickGlobalSettingsButton() {
-        await this.globalSettingsButton.click();
+    async hoverGlobalSettingsButton() {
+        await this.globalSettingsButton.hover();
     }
 
     async goToGlobalSettingsFeature(featureName: string) {
-        await this.clickGlobalSettingsButton();
+        await this.hoverGlobalSettingsButton();
         await this.page.locator(format(this.globalSettingFeature, featureName)).click();
     }
 
-    async isMainPageDisplayed(pageName: string) {
+    async verifyMainPageDisplays(pageName: string) {
         await expect(this.page.locator(format(this.mainPageDynamicStr, pageName))).toBeVisible();
     }
 
-    async isMainPageDeleted(pageName: string) {
+    async verifyMainPageDelete(pageName: string) {
         await expect(this.page.locator(format(this.mainPageDynamicStr, pageName))).toBeHidden();
     }
 
@@ -47,32 +47,27 @@ export class DashboardPage extends BasePage {
         await this.page.locator(format(this.childPageDynamicStr, parentPageName, childPageName)).click();
     }
 
-    async isChildPageDeleted(childPageName: string, parentPageName: string) {
+    async verifyChildPageDelete(childPageName: string, parentPageName: string) {
         await this.page.locator(format(this.mainPageDynamicStr, parentPageName)).hover();
         await expect(this.page.locator(format(this.childPageDynamicStr, parentPageName, childPageName))).toBeHidden();
     }
 
     async deleteCurrentPage() {
-        Utils.delay();
-        await this.clickGlobalSettingsButton();
+        await Utils.delay();
+        await this.hoverGlobalSettingsButton();
         this.page.once('dialog', async(dialog) => {
             await dialog.accept();
         });
-        await this.clickDeleteCurrentPageButton();
-    }
-
-    async clickDeleteCurrentPageButton() {
         await this.deleteCurrentPageButton.click();
     }
 
     async verifyTheMessageWhenDeletingPageThatHasChildPage(pageName: string) {
         this.page.once('dialog', async dialog => {
-            this.page.once('dialog', async dialog => {
-                await expect.soft(dialog.message().trim()).toEqual(format(messages.delete_page_warning_essage, pageName));
-                await dialog.accept();
+            this.page.once('dialog', async dialog2 => {
+                await expect.soft(dialog2.message().trim()).toEqual(format(messages.deletePageWarningMessage, pageName));
+                await dialog2.accept();
             });
-            await expect.soft(dialog.message().trim()).toEqual(messages.delete_page_confirm_message);
-            await dialog.accept();
+            await expect.soft(dialog.message().trim()).toEqual(messages.deletePageConfirmMessage);
         });
     }
 }
