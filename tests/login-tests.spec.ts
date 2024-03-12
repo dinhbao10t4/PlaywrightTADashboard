@@ -13,7 +13,7 @@ test.describe("Login Tests", () => {
     });
 
     test("Verify that user fails to login specific repository successfully via Dashboard login page with incorrect credentials", async ({loginPage}) => {
-        loginPage.verifyTheErrorMessageIsDisplayed();
         await loginPage.login(configuration.sampleRepository, users.invalidUser.username, users.invalidUser.password);
+        await loginPage.verifyTheErrorMessageIsDisplayed();
     });
 });

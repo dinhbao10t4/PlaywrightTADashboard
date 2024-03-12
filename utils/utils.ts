@@ -12,4 +12,14 @@ export class Utils {
     public static delay(timeout: number = Constants.WAIT_TIMEOUT) {
         return new Promise( resolve => setTimeout(resolve, timeout));
     };
+
+    public static replacingSpacesWithNbsp(str: string): string {
+        return str.replace(/ /g, '\u00a0');
+    }
+
+    public static isStringArraySorted(arr: string[]) {
+        let arrayCopy = [...arr];
+        arrayCopy.sort((one, two) => (one > two ? 1 : -1));
+        return JSON.stringify(arrayCopy) === JSON.stringify(arr);
+    }
 }

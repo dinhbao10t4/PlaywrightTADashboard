@@ -7,14 +7,50 @@ import messages from "../data/messages.json"
 export class DashboardPage extends BasePage {
     readonly globalSettingsButton: Locator;
     readonly deleteCurrentPageButton: Locator;
-    globalSettingFeature: string = "//a[contains(text(), '%s')]";
-    mainPageDynamicStr: string = "//div[@id='main-menu']//li/a[text()='%s']";
-    childPageDynamicStr: string = "//div[@id='main-menu']//li/a[text()='%s']/following-sibling::ul/li/a[text()='%s']";
+    readonly administerTab: Locator;
+    readonly choosePanelButton: Locator;
+    readonly overviewTab: Locator;
+
+    private readonly globalSettingFeature: string = "//a[contains(text(), '%s')]";
+    private readonly mainPageDynamicStr: string = "//div[@id='main-menu']//li/a[text()='%s']";
+    private readonly childPageDynamicStr: string = "//div[@id='main-menu']//li/a[text()='%s']/following-sibling::ul/li/a[text()='%s']";
+    private readonly administerItemDynamicStr: string = "//ul[@id='ulAdminister']/li/a[text()='%s']";
+    private readonly panelItemDynamicStr: string = "//div[text()='%s']/parent::div/table/tbody//td/ul/li/a";
     
     constructor(page: Page) {
         super(page);
         this.globalSettingsButton = this.page.locator(".mn-setting");
         this.deleteCurrentPageButton = this.page.locator("//a[contains(text(), 'Delete')]");
+        this.administerTab = this.page.locator("//ul[@id='ulAdminister']/parent::li");
+        this.choosePanelButton = this.page.locator("#btnChoosepanel");
+        this.overviewTab = this.page.locator("//div[@id='main-menu']/div/ul/li/a[text()='Overview']");
+    }
+
+    async openChoosePanelArea() {
+        await this.overviewTab.click();
+        await this.choosePanelButton.click();
+    }
+
+    async verifyPanelItemDataCorrectly(panelItem: string, panelItemPresetArr: string[]) {
+        let isSorted = false;
+        let isPanelItemPresetCorrect = true;
+
+        const elements = this.page.locator(format(this.panelItemDynamicStr, panelItem));
+        await elements.allInnerTexts().then((data: string[]) => {
+            isSorted = Utils.isStringArraySorted(data);
+            for (var val of panelItemPresetArr) {
+                if (data.includes(Utils.replacingSpacesWithNbsp(val)) == false) {
+                    isPanelItemPresetCorrect = false;
+                    break;
+                }
+            }
+        });
+        await expect(isSorted && isPanelItemPresetCorrect).toBe(true);
+    }
+
+    async goToAdministerItemPage(item: string) {
+        await this.administerTab.hover();
+        await this.page.locator(format(this.administerItemDynamicStr, item)).click();
     }
 
     async verifyDashBoardDisplays() {
